@@ -16,7 +16,11 @@ def main():
     AI = AI_model()
     data = np.load("DataExtract/train_data.npz")
     cv_data = np.load("DataExtract/CV_data.npz")
+
     AI.train(data)
+
+    # Uncomment for faster output
+    # AI.set_optimal_theta("optimal_theta.npz")
     AI.accuracy(data, cv_data)
 
     official_AI_model(data, cv_data)

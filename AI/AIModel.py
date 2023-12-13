@@ -43,3 +43,6 @@ class AI_model:
         for file in os.listdir(path):
             full_path = os.path.join(path, file)
             predict_photo(full_path)
+
+    def set_optimal_theta(self, path):
+        self.optimal_theta = np.load(path)['optimal_theta']
