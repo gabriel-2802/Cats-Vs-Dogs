@@ -45,13 +45,29 @@
         input[type="submit"]:hover {
             background-color: #0056b3;
         }
+               #warning-message {
+            color: red;
+            display: none;
+            margin-top: 10px;
+        }
     </style>
+    <script>
+        function validateForm() {
+            var x = document.forms["photoForm"]["file"].value;
+            if (x == "") {
+                document.getElementById("warning-message").style.display = "block";
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
     <h1>Predict a photo</h1>
-    <form method="post" enctype="multipart/form-data">
-      <input type="file" name="file">
-      <input type="submit" value="Upload">
+    <form name="photoForm" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+        <p id="warning-message">Please upload a photo.</p>
     </form>
 </body>
 </html>
