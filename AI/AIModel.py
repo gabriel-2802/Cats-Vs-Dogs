@@ -38,6 +38,20 @@ class AI_model:
     def save_optimal_theta(self):
         np.savez("optimal_theta.npz", optimal_theta=self.optimal_theta)
 
+    def predict_image(self, path):
+        x = load_image(path)
+        x = x.reshape(1, -1)
+
+        # load the pretrained parameters
+        optimal_theta = np.load("optimal_theta.npz")['optimal_theta']
+
+        prediction = np.round(forward_progation(x, optimal_theta))
+
+        if prediction == 0:
+            return "Is a cat"
+        else:
+            return "Is a dog"
+
     def predict_photo(self, path):
         print("Predicting photos in the directory: ", path)
         for file in os.listdir(path):
