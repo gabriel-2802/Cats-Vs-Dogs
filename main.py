@@ -11,36 +11,11 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 ai_model = AI_model()
 ai_model.set_optimal_theta('optimal_theta.npz')  # Set the path to your saved model
 
-# HTML Templates as Strings
-upload_html = '''
-<!doctype html>
-<html>
-  <head>
-    <title>AI predictor</title>
-  </head>
-  <body>
-    <h1>Predict a photo</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-</form>
-  </body>
-</html>
-'''
+with open('html/upload.html', 'r') as file:
+    upload_html = file.read()
 
-result_html = '''
-<!doctype html>
-<html>
-  <head>
-    <title>Result</title>
-  </head>
-  <body>
-    <h1>Prediction Result</h1>
-    <p>{{ prediction }}</p>
-    <a href="/">Try another image</a>
-  </body>
-</html>
-'''
+with open('html/result.html', 'r') as file:
+    result_html = file.read()
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
