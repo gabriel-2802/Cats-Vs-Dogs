@@ -31,7 +31,7 @@ The user can upload an image and the application will return the classification 
 
 ## Team Contributions
 - Mario Sampetru: built the data extraction and preprocessing pipeline and the web interface
-- Gabriel Carauleanu: built the AI model and the flask server
+- Gabriel Carauleanu: built the AI model and the flask server, the makefile
 
 ---
 
