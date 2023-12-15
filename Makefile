@@ -14,8 +14,8 @@ run:
 	@$(PYTHON) $(SCRIPT_NAME)
 
 # Target to run the demo function, showing the performance of the ai model
-.PHONY: demo
-demo:
+.PHONY: stats
+stats:
 	@$(PYTHON) -c 'import $(basename $(SCRIPT_NAME) .py); $(basename $(SCRIPT_NAME) .py).demo()'
 
 # Target to clean the uploads directory
@@ -23,3 +23,9 @@ demo:
 clean:
 	@if exist uploads\* del /Q uploads\*
 	@echo Cleaned uploads directory.
+
+# Target to install dependencies from requirements.txt
+.PHONY: build
+build:
+	@$(PYTHON) -m pip install -r requirements.txt
+	@echo Dependencies installed.
