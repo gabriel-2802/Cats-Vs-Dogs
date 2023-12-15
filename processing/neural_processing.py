@@ -1,4 +1,3 @@
-
 from input_data import load_image
 import numpy.linalg as la
 import numpy as np
