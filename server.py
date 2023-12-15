@@ -11,6 +11,7 @@ def demo():
     data = np.load("input_data/train_data.npz")
     cv_data = np.load("input_data/CV_data.npz")
 
+    print("\n")
     print("Using an AI model from the library sklearn: ")
     model = LogisticRegression(max_iter=1000)
     model.fit(data['X'], data['y'])
@@ -86,6 +87,8 @@ def create_app():
 
 def main():
     app = create_app()
+    print("Welcome to the Cat or Dog AI!\n")
+    print("Join our website and upload your cat or dog photo to see if it is a cat or a dog!")
     app.run(debug=True)
 
 
