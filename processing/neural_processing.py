@@ -1,10 +1,14 @@
 
-from DataExtract import load_image
+from input_data import load_image
+import numpy.linalg as la
+import numpy as np
+
 
 # the function maps any real value into another value between 0 and 1
 # it is used to normalize the data
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
+
 
 # the function unrolls the parameters into 2 matrixes
 def roll_parameters(theta, n):
@@ -15,6 +19,7 @@ def roll_parameters(theta, n):
     theta2 = np.reshape(theta[k * (n + 1):], (1, k + 1))
 
     return theta1, theta2
+
 
 # the function calculates the layers of our neural network
 def compute_layers(x, theta):
@@ -35,12 +40,14 @@ def compute_layers(x, theta):
 
     return a_1, a_2, a_3
 
+
 # the function calculates the output layer of our neural network
 def forward_progation(x, theta):
     a1, a2, a_3 = compute_layers(x, theta)
 
     # our prediction is the output layer
     return a_3
+
 
 # the function predicts if the photo is a cat or a dog
 def predict_photo(path):
@@ -62,50 +69,53 @@ def cost_function(theta, X, y, lambda_):
     m, n = X.shape
 
     # Roll parameters
-    # Assuming 'roll_parameters' appropriately converts 'theta' into Theta_1 and Theta_2
-    Theta_1, Theta_2 = roll_parameters(theta, n)
+    # Assuming 'roll_parameters' appropriately converts 'theta' into theta_1 and theta_2
+    theta_1, theta_2 = roll_parameters(theta, n)
 
     # Forward propagation
     a_1 = np.vstack((np.ones((1, m)), X.T))
-    z_2 = Theta_1.dot(a_1)
+    z_2 = theta_1.dot(a_1)
     a_2 = np.vstack((np.ones((1, m)), sigmoid(z_2)))
-    z_3 = Theta_2.dot(a_2)
+    z_3 = theta_2.dot(a_2)
     a_3 = sigmoid(z_3)  # predictions
 
     # Backpropagation
     delta_3 = a_3 - y.T
-    delta_2 = (Theta_2.T.dot(delta_3)) * (a_2 * (1 - a_2))
+    delta_2 = (theta_2.T.dot(delta_3)) * (a_2 * (1 - a_2))
     delta_2 = delta_2[1:, :]
 
     # Unregularized gradients
-    Theta_grad_2 = 1 / m * delta_3.dot(a_2.T)
-    Theta_grad_1 = 1 / m * delta_2.dot(a_1.T)
+    theta_grad_2 = 1 / m * delta_3.dot(a_2.T)
+    theta_grad_1 = 1 / m * delta_2.dot(a_1.T)
 
     # Cost function with regularization
-    J = -1 / m * np.sum(y.T * np.log(a_3) + (1 - y.T) * np.log(1 - a_3))
-    J += lambda_ / (2 * m) * (np.sum(Theta_1[:, 1:] ** 2) + np.sum(Theta_2[:, 1:] ** 2))
+    j = -1 / m * np.sum(y.T * np.log(a_3) + (1 - y.T) * np.log(1 - a_3))
+    j += lambda_ / (2 * m) * (np.sum(theta_1[:, 1:] ** 2) + np.sum(theta_2[:, 1:] ** 2))
 
     # Regularization for gradients
-    Theta_grad_2[:, 1:] += lambda_ / m * Theta_2[:, 1:]
-    Theta_grad_1[:, 1:] += lambda_ / m * Theta_1[:, 1:]
+    theta_grad_2[:, 1:] += lambda_ / m * theta_2[:, 1:]
+    theta_grad_1[:, 1:] += lambda_ / m * theta_1[:, 1:]
 
     # Unroll gradients
-    gradient = np.concatenate([Theta_grad_1.ravel(), Theta_grad_2.ravel()])
+    gradient = np.concatenate([theta_grad_1.ravel(), theta_grad_2.ravel()])
 
-    return J, gradient
+    return j, gradient
 
-# TODO choose epsilon : epsilon = sqrt(6) / sqrt(L_in + L_out)
+
 def initialize_weights(epsilon, rows, cols):
     return 2 * epsilon * np.random.rand(rows, cols) - epsilon
+
 
 def gradient_descent(x, y, initial_theta, lr, lmb, iterations):
     # m is the number of training examples
     m = x.shape[0]
 
     theta = initial_theta
+    j = None
+    grad = None
 
     for i in range(1, iterations + 1):
-        J, grad = cost_function(theta, x, y, lmb)
+        j, grad = cost_function(theta, x, y, lmb)
 
         # Adjust the learning rate over time
         learning_rate = lr / (5000 + 0.8 * i)
@@ -122,72 +132,7 @@ def gradient_descent(x, y, initial_theta, lr, lmb, iterations):
             break
 
     # Return the optimized parameters and the cost associated with these parameters
-    return theta, J
-
-
-# -*- coding: cp1252 -*-
-
-# Minimize a continuous differentialble multivariate function. Starting point
-# is given by "X" (D by 1), and the function named in the string "f", must
-# return a function value and a vector of partial derivatives. The Polack-
-# Ribiere flavour of conjugate gradients is used to compute search directions,
-# and a line search using quadratic and cubic polynomial approximations and the
-# Wolfe-Powell stopping criteria is used together with the slope ratio method
-# for guessing initial step sizes. Additionally a bunch of checks are made to
-# make sure that exploration is taking place and that extrapolation will not
-# be unboundedly large. The "length" gives the length of the run: if it is
-# positive, it gives the maximum number of line searches, if negative its
-# absolute gives the maximum allowed number of function evaluations. You can
-# (optionally) give "length" a second component, which will indicate the
-# reduction in function value to be expected in the first line-search (defaults
-# to 1.0). The function returns when either its length is up, or if no further
-# progress can be made (ie, we are at a minimum, or so close that due to
-# numerical problems, we cannot get any closer). If the function terminates
-# within a few iterations, it could be an indication that the function value
-# and derivatives are not consistent (ie, there may be a bug in the
-# implementation of your "f" function). The function returns the found
-# solution "X", a vector of function values "fX" indicating the progress made
-# and "i" the number of iterations (line searches or function evaluations,
-# depending on the sign of "length") used.
-# %
-# Usage: X, fX, i = fmincg(f, X, options)
-# %
-# See also: checkgrad
-# %
-# Copyright (C) 2001 and 2002 by Carl Edward Rasmussen. Date 2002-02-13
-# %
-# %
-# (C) Copyright 1999, 2000 & 2001, Carl Edward Rasmussen
-
-# Permission is granted for anyone to copy, use, or modify these
-# programs and accompanying documents for purposes of research or
-# education, provided this copyright notice is retained, and note is
-# made of any changes that have been made.
-
-# These programs and documents are distributed without any warranty,
-# express or implied.  As the programs were written for research
-# purposes only, they have not been tested to the degree that would be
-# advisable in any important application.  All use of these programs is
-# entirely at the user's own risk.
-
-# [ml-class] Changes Made:
-# 1) Function name and argument specifications
-# 2) Output display
-
-# [Iago López Galeiras] Changes Made:
-# 1) Python translation
-
-# [Sten Malmlund] Changes Made:
-# 1) added option['maxiter'] passing
-# 2) changed a few np.dots to np.multiplys
-# 3) changed the conatenation line so that now it can handle one item arrays
-# 4) changed the printing part to print the Iteration lines to the same row
-
-import numpy as np
-import sys
-import numpy.linalg as la
-
-from math import isnan, isinf
+    return theta, j
 
 
 def div(a, b):
@@ -195,8 +140,6 @@ def div(a, b):
 
 
 # Refference: https://github.com/stena/ml/blob/master/fmincg.py
-import numpy as np
-
 def fmincg(f, X, options, *args):
     if 'MaxIter' in options:
         length = options['MaxIter']
@@ -331,7 +274,6 @@ def fmincg(f, X, options, *args):
             ls_failed = True
 
     return X, np.array(fX), i
-
 # Example usage:
 # Define a function 'f' that returns function value and gradient
 # X, fX, i = fmincg(f, X, options, P1, P2, P3, P4, P5
