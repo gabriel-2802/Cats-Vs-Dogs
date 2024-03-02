@@ -36,7 +36,6 @@ The user can upload an image and the application will return the classification 
 ---
 
 ### Notes
-- Class AIModel is abstract, so we can easily add new models in the future
 - The model was trained on a dataset of 12,500 images of cats and dogs
 
 ---
